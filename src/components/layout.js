@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { Link } from "gatsby";
 import { StaticQuery, graphql } from "gatsby";
+import Img from 'gatsby-image'
 import { HelmetDatoCms } from "gatsby-source-datocms";
 
 import "../styles/index.sass";
@@ -23,6 +24,11 @@ const TemplateWrapper = ({ children }) => {
             }
           }
           datoCmsHome {
+            a440Logo {
+              fluid(maxWidth: 200, imgixParams: { fm: "png", auto: "compress" }) {
+                ...GatsbyDatoCmsSizes
+              }
+            }
             seoMetaTags {
               ...GatsbyDatoCmsSeoMetaTags
             }
@@ -32,6 +38,15 @@ const TemplateWrapper = ({ children }) => {
               }
             }
             copyright
+          }
+          allDatoCmsWork {
+            edges {
+              node {
+                id
+                slug
+                title
+              }
+            }
           }
           allDatoCmsSocialProfile(sort: { fields: [position], order: ASC }) {
             edges {
@@ -51,9 +66,9 @@ const TemplateWrapper = ({ children }) => {
           />
           <div className="container__sidebar">
             <div className="sidebar">
-              <h6 className="sidebar__title">
-                <Link to="/">{data.datoCmsSite.globalSeo.siteName}</Link>
-              </h6>
+              <div className="sidebar_logo">
+                <Img fluid={data.datoCmsHome.a440Logo.fluid} />
+              </div>
               <div
                 className="sidebar__intro"
                 dangerouslySetInnerHTML={{
@@ -68,6 +83,15 @@ const TemplateWrapper = ({ children }) => {
                 <li>
                   <Link to="/about">About</Link>
                 </li>
+                {data.allDatoCmsWork.edges.map(({ node: work }) => (
+                  <div key={work.id}>
+                    <li>
+                      <Link to={`/works/${work.slug}`}>
+                        {work.title}
+                      </Link>
+                    </li>
+                 </div>
+                ))}
               </ul>
               <p className="sidebar__social">
                 {data.allDatoCmsSocialProfile.edges.map(({ node: profile }) => (
